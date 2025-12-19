@@ -5,7 +5,7 @@
 @file     : views.py 
 @create   : 2020/7/1 22:37 
 """
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema
 from rest_framework import status, serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView
@@ -37,7 +37,7 @@ class MultipleDestroyMixin:
             raise ValidationError('删除数据不存在')
         return del_queryset
 
-    @swagger_auto_schema(request_body=MultipleDeleteSerializer)
+    @extend_schema(request=MultipleDeleteSerializer)
     def multiple_delete(self, request, *args, **kwargs):
         delete_ids = request.data.get('ids')
         del_queryset = self.validate_ids(delete_ids)

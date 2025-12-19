@@ -11,7 +11,7 @@ from inspect import isfunction, getmembers
 from apscheduler.jobstores.base import JobLookupError
 from django_apscheduler.models import DjangoJobExecution
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_yasg.utils import swagger_auto_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, OpenApiResponse
 from rest_framework import status
 from rest_framework.filters import SearchFilter
 from rest_framework.generics import ListAPIView, ListCreateAPIView, DestroyAPIView
@@ -93,7 +93,14 @@ class JobsListCreateAPIView(ListCreateAPIView):
         else:
             return JobCreateSerializer
 
-    @swagger_auto_schema(operation_id='system_jobs_deletes')
+    @extend_schema(
+        operation_id='system_jobs_deletes',
+        summary="清空所有任务",
+        description="删除所有已配置的任务",
+        responses={
+            204: OpenApiResponse(description="成功清空所有任务"),
+        }
+    )
     def delete(self, request, *args, **kwargs):
         scheduler.remove_all_jobs()
         return Response(status=status.HTTP_204_NO_CONTENT)

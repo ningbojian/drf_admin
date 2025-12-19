@@ -14,10 +14,10 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
-from rest_framework_jwt.views import ObtainJSONWebToken
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
-class UserLoginView(ObtainJSONWebToken):
+class UserLoginView(TokenObtainPairView):
     """
     post:
     用户登录

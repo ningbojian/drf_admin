@@ -6,10 +6,10 @@
 @file     : swagger_schema.py
 @create   : 2020/11/26 21:27
 """
-from drf_yasg.inspectors import SwaggerAutoSchema
+from drf_spectacular.openapi import AutoSchema
 
 
-class OperationIDAutoSchema(SwaggerAutoSchema):
+class OperationIDAutoSchema(AutoSchema):
     """覆盖get_operation_id方法, 添加multiple_delete动作"""
 
     def get_operation_id(self, operation_keys=None):

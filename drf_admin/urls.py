@@ -18,23 +18,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.decorators.clickjacking import xframe_options_exempt
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView,SpectacularJSONAPIView, SpectacularYAMLAPIView
 from rest_framework import permissions
 
-# swagger API文档配置 https://github.com/axnsan12/drf-yasg
-schema_view = get_schema_view(
-    openapi.Info(
-        title="DRF Admin API",
-        default_version='v1.0.0',
-        description="Test Description",
-        terms_of_service="https://github.com/tianpangji",
-        contact=openapi.Contact(email="92178199@qq.com"),
-        license=openapi.License(name="BSD License"),
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
 
 base_api = settings.BASE_API
 
@@ -50,11 +36,29 @@ urlpatterns = [
     path(f'{base_api}information/', include('information.urls')),  # 个人中心模块
 
     # swagger(API文档)
-    re_path(rf'^{base_api}swagger(?P<format>\.json|\.yaml)$',
-            xframe_options_exempt(schema_view.without_ui(cache_timeout=0)), name='schema-json'),
+    # JSON 格式的 OpenAPI 规范
+    re_path(rf'^{base_api}swagger\.json$',
+            xframe_options_exempt(SpectacularJSONAPIView.as_view()),
+            name='schema-json'),
+
+    # YAML 格式的 OpenAPI 规范
+    re_path(rf'^{base_api}swagger\.yaml$',
+            xframe_options_exempt(SpectacularYAMLAPIView.as_view()),
+            name='schema-yaml'),
+
+    # Swagger UI 文档界面
     path(f'{base_api}swagger/',
-         xframe_options_exempt(schema_view.with_ui('swagger', cache_timeout=0)), name='schema-swagger-ui'),
+         xframe_options_exempt(SpectacularSwaggerView.as_view(url_name='schema')),
+         name='schema-swagger-ui'),
+
+    # ReDoc 文档界面
     path(f'{base_api}redoc/',
-         xframe_options_exempt(schema_view.with_ui('redoc', cache_timeout=0)), name='schema-redoc'),
+         xframe_options_exempt(SpectacularRedocView.as_view(url_name='schema')),
+         name='schema-redoc'),
+
+    # 通用的 schema 端点（可选，用于获取当前格式的 schema）
+    path(f'{base_api}schema/',
+         xframe_options_exempt(SpectacularAPIView.as_view()),
+         name='schema'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

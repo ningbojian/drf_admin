@@ -14,6 +14,7 @@ import os
 import sys
 
 import psutil
+import timedelta
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,7 +23,7 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
-
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'mppodn1q7pk7hh)da39+yc1$^rcovyc)$lt69*wprdz_mjayaa'
 
@@ -47,7 +48,8 @@ INSTALLED_APPS = [
     # model过滤
     'django_filters',
     # swagger
-    'drf_yasg',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
     # WebSocket
     'channels',
     # django_user_agents
@@ -93,7 +95,8 @@ CORS_ORIGIN_WHITELIST = (
 )
 # 允许携带cookie
 CORS_ALLOW_CREDENTIALS = True
-
+# 配置跨域
+CORS_ALLOW_ALL_ORIGINS = True  # 允许所有源，开发时方便，生产环境应关闭
 ROOT_URLCONF = 'drf_admin.urls'
 
 TEMPLATES = [
@@ -224,10 +227,10 @@ REST_FRAMEWORK = {
         ),
     'DEFAULT_AUTHENTICATION_CLASSES':
         (
-            'rest_framework_jwt.authentication.JSONWebTokenAuthentication',  # DRF-JWT认证
+            'rest_framework_simplejwt.authentication.JWTAuthentication',  # DRF-JWT认证
         ),
     # DRF-API文档
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_THROTTLE_RATES': {'anon': '10/min', }
 }
 
@@ -248,7 +251,7 @@ WHITE_LIST = [f'/{BASE_API}oauth/login/', f'/{BASE_API}oauth/info/', f'/{BASE_AP
 REGEX_URL = '^{url}$'  # 权限匹配时,严格正则url
 PROJECT_START_TIME = psutil.Process().create_time()
 
-# Swagger配置 https://github.com/axnsan12/drf-yasg/issues/58
+# Swagger配置
 SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': False,
     'SECURITY_DEFINITIONS': {
@@ -375,4 +378,29 @@ LOGGING = {
             'propagate': True,
         }
     }
+}
+
+# drf-spectacular 配置
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'DRF Admin API',
+    'DESCRIPTION': 'Test Description',
+    'VERSION': '1.0.0',
+    'TERMS_OF_SERVICE': 'https://github.com/tianpangji',
+    'CONTACT': {
+        'name': 'Contact',
+        'email': '92178199@qq.com',
+    },
+    'LICENSE': {
+        'name': 'BSD License',
+    },
+    'SERVE_INCLUDE_SCHEMA': False,  # 不在 Swagger UI 中包含 schema 下载链接
+
+    # 可选：如果你想要更好的UI效果
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+
+    # 如果你的 API 使用 JWT 认证
+    'SECURITY': [],
+    'COMPONENT_SPLIT_REQUEST': True,
+
 }

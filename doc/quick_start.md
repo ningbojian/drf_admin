@@ -129,7 +129,7 @@ const getTokenByPostRequest = {
 };
 
 pm.sendRequest(getTokenByPostRequest, function (err, response) {
-        pm.environment.set("token", response.json().data.token);
+        pm.environment.set("token", response.json().data.access);
     }
 );
 ```
